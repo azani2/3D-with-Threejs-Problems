@@ -1,0 +1,62 @@
+﻿<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="CSG.js"></script>
+		<script>
+			// Задача: конструирайте ... хипербола
+
+			
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			var scene = new THREE.Scene();
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 0, 100 );
+			camera.lookAt( new THREE.Vector3() );
+
+			// За момента имаме само окръжност
+			var material = new THREE.MeshPhongMaterial({color:'red'});
+			var topCone = new THREE.Mesh(new THREE.CylinderGeometry( 20, 0, 25, 80 ));
+			var bottomCone = new THREE.Mesh(new THREE.CylinderGeometry( 20, 0, 25, 80 ));
+
+			topCone.position.y=12.5;
+			bottomCone.position.y=-12.5;
+			bottomCone.rotation.z+=Math.PI;
+
+			var csg = new CSG();
+			csg.union([topCone, bottomCone]);
+
+			var plane = new THREE.Mesh(new THREE.BoxGeometry(50, 50, 1/4));
+			plane.position.z = -5;
+
+			csg.intersect([plane]);
+			var graph = csg.toMesh();
+			graph.material = material;
+
+			scene.add(graph);
+
+			// Добавяме светлина
+			light = new THREE.PointLight( 'lightblue' );
+			light.position.set( 0, 0, 100 );
+			scene.add( light );
+			
+			function drawFrame()
+			{
+				// въртим окръжността
+				graph.rotation.y += 0.004;
+				
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,396 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+        <h1>ф.н. 2MI0800218 &ndash; група 6 &ndash; Анелия Воденичарова</h1>
+		<script src="three.min.js"></script>
+		<script>
+            var slideSound = new Audio( 'slide.wav' ),
+            boomSound = new Audio( 'boom.wav' );
+            
+            var renderer = new THREE.WebGLRenderer( {antialias: true} );
+            renderer.setAnimationLoop( drawFrame );
+            renderer.setSize( innerWidth, innerHeight );
+
+            var scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera( 30, innerWidth/innerHeight, 0.1, 1000 );
+
+            //-------------------------------------------------------------------------------------
+
+            var part1 = new THREE.Group( );
+            var part2 = new THREE.Group( );
+            var material = new THREE.MeshPhongMaterial({color: "skyblue"});            
+            var extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1, curveSegments: 60 };
+            
+
+            //---------------------------------PART 2--------------------------------------------
+            //2.01
+            var shape = new THREE.Shape();
+            shape.moveTo(  -7.37, 4.3);
+            shape.lineTo( -4.3, 4.3);
+            shape.lineTo( -2.67, 2.67);
+            shape.lineTo( -7.37, 2.67);
+            shape.moveTo(  -7.37, 4.3);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+            stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.02
+            shape = new THREE.Shape();
+            shape.moveTo(  -5.81, 2.67);
+            shape.lineTo( -5.81, -6.4);
+            shape.lineTo( -4.07, -6);
+            shape.lineTo( -4.07, 2.67);
+            shape.moveTo(  -5.81, 2.67);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.03
+            shape = new THREE.Shape();
+            shape.moveTo(  -8.48, 1.11);
+            shape.lineTo( -1.56, 1.11);
+            shape.lineTo( -1.56, -0.48);
+            shape.lineTo( -8.48, -0.48);
+            shape.moveTo(  -8.48, 1.11);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.04
+            shape = new THREE.Shape();
+            shape.moveTo(  -0.85, 0.19);
+            shape.lineTo( -0.19, 0.19);
+            shape.lineTo( 1.4, -1.4);
+            shape.lineTo( -0.85, -1.4);
+            shape.moveTo(  -0.85, 0.19);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+			geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.05
+            shape = new THREE.Shape();
+            shape.moveTo(  -8.67, -1.77);
+            shape.lineTo( -7.15, -1.4);
+            shape.quadraticCurveTo( -6.2, -3.5, -6.29, -5.29);
+            shape.lineTo( -7.85, -5.67);
+            shape.quadraticCurveTo( -7.82, -4.5, -8.67, -1.77);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0,.7, -5.1);
+            part2.add(stroke);
+
+            //2.06
+            shape = new THREE.Shape();
+            shape.moveTo(  -8.85, -6.78);
+            shape.quadraticCurveTo(-5, -6.35, -1.07, -5.15);
+            shape.lineTo( -1.07, -6.78);
+            shape.quadraticCurveTo( -4.1, -7.8, -8.59, -8.44);
+            shape.lineTo( -8.85, -6.78);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.07
+            shape = new THREE.Shape();
+            shape.moveTo(  -2.78, -1.33);
+            shape.lineTo( -1.26, -1.76);
+            shape.quadraticCurveTo( -1.5, -3.4, -2.15, -4.81);
+            shape.lineTo( -3.59, -4.26);
+            shape.quadraticCurveTo( -2.85, -2.3, -2.78, -1.33);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.08
+            shape = new THREE.Shape();
+            shape.moveTo( -6.74, 6.74);
+            shape.lineTo( -5.48, 5.48);
+            shape.quadraticCurveTo( -6.8, 3.8, -8.03, 2.81);
+            shape.lineTo( -8.96, 4.40);
+            shape.quadraticCurveTo( -7.6, 5.5, -6.74, 6.74);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.09
+            shape = new THREE.Shape();
+            shape.moveTo( -0.41, -4.48);
+            shape.lineTo( 0.63, -3.19);
+            shape.quadraticCurveTo( 3.15, -4.4, 6.33, -7.48);
+            shape.lineTo( 5.37, -8.91);
+            shape.quadraticCurveTo( 2.8, -6, -0.41, -4.48);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //2.10
+            shape = new THREE.Shape();
+            shape.moveTo( 3.81, -3.81);
+            shape.lineTo( 5.03, -5.03);
+            shape.lineTo(4.4, -5.67);
+            shape.lineTo( 2.96, -4.67);
+            shape.quadraticCurveTo( 3.5, -4.2, 3.81, -3.81);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .7, -5.1);
+            part2.add(stroke);
+
+            //---------------------------------PART 1--------------------------------------------
+
+            //1.01
+            shape = new THREE.Shape();
+            shape.moveTo( 0.81, 1.78);
+            shape.lineTo( 0.81, 3.44);
+            shape.lineTo( 6.22,  3.44);
+            shape.lineTo( 6.22, 1.78);
+            shape.moveTo( 0.81, 1.78);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.02
+            shape = new THREE.Shape();
+            shape.moveTo(  -0.19, 0.19);
+            shape.lineTo( 7.85, 0.19);
+            shape.lineTo( 7.85, -1.4);
+            shape.lineTo( 1.4, -1.4);
+            shape.moveTo(  -0.19, 0.19);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.03
+            shape = new THREE.Shape();
+            shape.moveTo( 5.74, -1.4);
+            shape.lineTo( 7.85, -1.4);
+            shape.quadraticCurveTo( 7, -3, 5.03, -5.03);
+            shape.lineTo( 3.81, -3.81);
+            shape.quadraticCurveTo( 5.2, -2.5, 3.81, -3.81);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.04
+            shape = new THREE.Shape();
+            shape.moveTo( 2.89, 9.04);
+            shape.lineTo( 4.56, 8.56);
+            shape.quadraticCurveTo( 2.6, 4.5, -0.89, 1.52);
+            shape.lineTo( -2, 2.85);
+            shape.quadraticCurveTo( 1.9, 6.4, 2.89, 9.04);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.05
+            shape = new THREE.Shape();
+            shape.moveTo( 3.3, 6.37);
+            shape.lineTo( 4.37, 8.15);
+            shape.quadraticCurveTo( 5.65, 5.6, 8.92, 2.89);
+            shape.lineTo( 7.89, 1.48);
+            shape.quadraticCurveTo( 4, 4.8, 3.3, 6.37);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.06
+            shape = new THREE.Shape();
+            shape.moveTo( -6.74, 6.74);
+            shape.quadraticCurveTo( -6.1, 7.6, -5.19, 9.08);
+            shape.lineTo( -3.52, 8.48);
+            shape.quadraticCurveTo( -4.5, 6.4, -5.48, 5.48);
+            shape.lineTo( -6.74, 6.74);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.07
+            shape = new THREE.Shape();
+            shape.moveTo( -4.67, 6.56);
+            shape.lineTo( -3.78, 8.04);
+            shape.quadraticCurveTo( -2.9, 7.3, -0.85, 4.96);
+            shape.lineTo( -2.11, 3.63);
+            shape.quadraticCurveTo( -3.6, 5.6, -4.67, 6.56);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            //1.08
+            shape = new THREE.Shape();
+            shape.moveTo(  -4.3, 4.3);
+            shape.lineTo( -2.37, 4.3);
+            shape.lineTo( -2.37, 2.67);
+            shape.lineTo( -2.67, 2.67);
+            shape.moveTo(  -4.3, 4.3);
+
+            geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            geometry.scale(1.15, 1, 1.15);
+			stroke = new THREE.Mesh( geometry, material );
+            stroke.position.set(0, .73, -5.1);
+            part1.add(stroke);
+
+            part1.position.y -= 1;
+            part2.position.y -= 1;
+            //-------------------------------------------------------------------------------------
+
+            scene.add( part1, part2 );
+            //-------------------------------------------------------------------------------------
+
+            var lights = [
+                new THREE.PointLight( 'dodgerblue' ),
+                new THREE.PointLight( 'hotpink' ),
+                new THREE.PointLight( 'cyan' ),
+                new THREE.PointLight( 'fuchsia' ),
+            ];
+            scene.add( ...lights );
+
+            var ground = new THREE.Mesh(
+                new THREE.PlaneGeometry( 5000, 5000 ),
+                new THREE.MeshPhongMaterial( {color: 'goldenrod'} )
+            );
+            ground.position.y = -11;
+            ground.rotation.x = -Math.PI/2;
+            scene.add( ground );
+
+            var boxFrame = new THREE.Mesh(
+                new THREE.BoxGeometry( 21, 21, 11 ),
+                new THREE.MeshPhongMaterial( {color: 'white', shininess: 220, opacity: 0.45, transparent: true, side: THREE.DoubleSide} )
+                );
+            boxFrame.add( new THREE.BoxHelper(boxFrame,'white') );
+            boxFrame.visible = false;
+            scene.add( boxFrame );
+
+            window.addEventListener( 'resize', (event) => {
+                camera.aspect = innerWidth/innerHeight;
+                camera.updateProjectionMatrix( );
+                renderer.setSize( innerWidth, innerHeight );
+            });
+
+            window.addEventListener( 'load', function() {
+                document.body.appendChild( renderer.domElement );
+                document.body.addEventListener( 'click', frameSlide );
+                document.body.addEventListener( 'keypress', frameSlide );
+                document.body.addEventListener( 'contextmenu', frameSlide );
+            });
+
+            function frameSlide(event) {
+                if (event.button == 0 || event.keyCode == 32 ) {
+                    // стартира плъзгане в обратна посока
+                    if( time-slideTime < T )
+                        slideTime = time + T-(time-slideTime);
+                    else
+                        slideTime = time;
+                    
+                    slideDir = -slideDir;
+                    slideSound.play();
+                    boom = slideDir<0;
+                } else {
+                    event.preventDefault();
+                    boxFrame.visible = !boxFrame.visible;
+                }
+            }
+
+            const T = 0.8;		// време за плъзгане
+            var slideDir = -1,	// посока на плъзгане
+                time,			// текущо време
+                slideTime,		// начало на плъзгането
+                vib = 0,		// амплитуда на вибрация
+                boom = false;	// дали трябва да се прави буууум
+                
+            function drawFrame(t) {
+                // време от милисекунди в секунди
+                time = t/1000;
+
+                // плъзгане за T секунди само
+                if ( time-slideTime < T ) {
+                    part1.position.x = 2 + 2*slideDir*Math.sin( ((time-slideTime)/T-0.5)*Math.PI );
+                    part2.position.x = -part1.position.x;
+                }
+                
+                // буум при "затваряне" на йероглифа
+                if( boom && time-slideTime > T-0.1 ) {
+                    boom = false;
+                    boomSound.play();
+                    vib = 1;
+                }
+                
+                // непрекъснато въртене на сцената
+                scene.rotation.x = 0.1 * Math.sin( time+1 );
+                scene.rotation.y = 0.5 * Math.sin( time+2 );
+                scene.rotation.z = 0.1 * Math.cos( time+3 );
+
+                // вибриране на камерата
+                camera.position.set( 0, 3-Math.sin(50*time)*vib, 60 );
+                camera.lookAt( new THREE.Vector3( 0, Math.sin(50*time)*vib, 0 ) );
+                vib = vib*0.96;
+
+                // движение на светлините
+                for (var i=0; i<4; i++) {
+                    var angle = time+Math.PI/2*i;
+                    lights[i].position.set(
+                            25*Math.cos( angle ),
+                        5 + 10*Math.sin( 1.5*angle ),
+                        15 +  5*Math.cos( 2*angle )
+                    );
+                }
+                
+                //рисуване на сцената
+                renderer.render( scene, camera );
+            }
+            
+        </script>
+	</body>
+</html>

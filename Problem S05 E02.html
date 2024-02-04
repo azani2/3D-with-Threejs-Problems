@@ -1,0 +1,69 @@
+﻿<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="CSG.js"></script>
+		<script>
+			// Задача: конструирайте златен осмоъгълен
+			// пепелник-сувенир за четирима. 
+
+			
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 'midnightblue' );
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 0, 8 );
+			camera.lookAt( new THREE.Vector3() );
+
+		
+			// Пепелник (за момента е цилиндър,
+			// но вие ще го оформите на пепелник)
+			var outerWall = new THREE.Mesh( new THREE.CylinderGeometry( 1.7, 2, 1, 8 ));
+			var hole = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.7, 1, 8));
+			var dentA = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 5));
+			hole.position.set(0, 0.5, 0);
+			dentA.rotation.z+= Math.PI/2;
+			dentA.position.set(0, .5, 0);
+			var dentB = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 5));
+			dentB.rotation.z+= Math.PI/2;
+			dentB.rotation.y+= Math.PI/2;
+			dentB.position.set(0, .5, 0);
+			
+			var csg = new CSG();
+			csg.subtract( [outerWall, hole, dentA, dentB] );
+
+			var ashTray = csg.toMesh();
+			ashTray.material = new THREE.MeshNormalMaterial( {
+				transparent: true,
+				opacity: 0.5
+			} );
+			scene.add(ashTray);
+			
+			
+			var light = new THREE.PointLight();
+			light.position.set( 0, 5, 10 );
+			scene.add( light );
+			
+			
+			function drawFrame()
+			{
+				// въртим пепелника
+				ashTray.rotation.x = 0.3+0.2*Math.sin(ashTray.rotation.y);
+				ashTray.rotation.y += 0.010;
+				
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>

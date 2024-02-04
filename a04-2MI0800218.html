@@ -1,0 +1,180 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="CSG.js"></script>
+		<script>
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x11133d );
+
+			var aspect = window.innerWidth/window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 50, 150 );
+			camera.lookAt( new THREE.Vector3( 0, -2, 0 ) );
+
+            //-----------------------------------------------MECH PART--------------------------------
+            
+            //top part
+            var mech = new THREE.Group();
+            var material = new THREE.MeshPhongMaterial( {
+				color: "silver",
+                shininess: 54,
+                emissive: 0x000000,
+                specular: 0x111111
+			} );
+            var outerTop = new THREE.Mesh( new THREE.SphereGeometry( 10, 32, 32));
+			var holeUnder = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20));
+            holeUnder.position.set(0, -10, 0);
+			var holeAbove = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20));
+            holeAbove.position.set(0, 17.5, 0);
+            var holeAbovePentagon = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 10, 6));
+            holeAbovePentagon.position.set(0, 10, 0);
+
+			var csg = new CSG();
+			csg.subtract( [outerTop, holeUnder, holeAbove, holeAbovePentagon] );
+			
+            //long part
+            var mechLong = new THREE.Mesh(new THREE.CylinderGeometry(5, 4, 40, 16));
+            mechLong.position.set(0, -15, 0);
+            csg.union([mechLong]);
+
+            //sharp end
+            var outer = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 10, 16));
+            var inner = new THREE.Mesh(new THREE.CylinderGeometry(5, 0, 9, 16));
+            inner.position.set(0, 2, 0);
+            var cutoutCsg = new CSG();
+            cutoutCsg.subtract([outer, inner]);
+            var cutout = cutoutCsg.toMesh();
+            cutout.position.set(0, -32, 0);
+            csg.subtract([cutout]);
+            
+            //carvings
+            outer = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.5, 6));
+            inner = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.2, 0.5, 6));
+            cutoutCsg = new CSG();
+            cutoutCsg.subtract([outer, inner]);
+            var cutout = cutoutCsg.toMesh();
+
+            for(let i = -1; i > -26; i-= 2) {
+                cutout.position.set(0, i, 0);
+                csg.subtract([cutout]);
+            }
+
+            var mechBody = csg.toMesh();
+			mechBody.material = material;
+            mechBody.receiveShadow = true;
+            mechBody.castShadow = true;
+            mech.add(mechBody);
+            mech.position.set(-45, 0, 0);
+            scene.add(mech);
+            
+            //-----------------------------------------------MECH-------------------------------------
+            
+
+            //-----------------------------------------------HAT--------------------------------------
+            var hat = new THREE.Group();
+            var material = new THREE.MeshPhongMaterial( {
+                color: 0x201000,
+                specular: 'lightslategray',
+                shininess: 10
+            } );
+
+            //top
+            var extrudeSettings = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1, curveSegments: 60 };
+            
+            var shape = new THREE.Shape();
+			shape.moveTo(  0, 0);
+			//absarc (xPos, yPos, radus, startAngle, endAngle, clockwise)
+			shape.absarc( 0, 0, 15, 0, Math.PI*2, false );
+            
+            var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            var hatPart = new THREE.Mesh( geometry, material );
+            hatPart.rotation.x += Math.PI/2;
+            hatPart.position.y = 1.5;
+            hat.add(hatPart);
+
+            //cylinder
+            extrudeSettings = { depth: 30, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1, curveSegments: 60 };
+			
+            var hole = new THREE.Path();
+			hole.moveTo(  0, 0 );
+			hole.absarc( 0, 0, 14, 0, Math.PI*2, false );
+			shape.holes.push( hole );
+
+			geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+			hatPart = new THREE.Mesh( geometry, material );
+            hatPart.rotation.x += Math.PI/2;
+            hat.add(hatPart);
+
+            //bottom
+            extrudeSettings = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1, curveSegments: 60 };
+            
+            var visor = new THREE.Shape();
+			visor.moveTo(  0, 0);
+			visor.absarc( 0, 0, 30, 0, Math.PI*2, false );
+            visor.holes.push(hole);
+            
+            geometry = new THREE.ExtrudeGeometry( visor, extrudeSettings );
+            hatPart = new THREE.Mesh( geometry, material );
+            hatPart.rotation.x += Math.PI/2;
+            hatPart.position.y = -30;
+            hat.add(hatPart);
+            
+            //band
+            var material = new THREE.MeshPhongMaterial( {
+                color: 'maroon',
+                emissive: 'black',
+                specular: 'gray',
+                shininess: 20
+            } );
+
+            extrudeSettings = { depth: 15, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1, curveSegments: 60 };
+			
+            var band = new THREE.Shape();
+            band.moveTo(  0, 0);
+			band.absarc( 0, 0, 16, 0, Math.PI*2, false );
+            hole = new THREE.Path();
+			hole.moveTo(  0, 0 );
+			hole.absarc( 0, 0, 15, 0, Math.PI*2, false );
+			band.holes.push( hole );
+
+			geometry = new THREE.ExtrudeGeometry( band, extrudeSettings );
+			hatPart = new THREE.Mesh( geometry, material );
+            hatPart.rotation.x += Math.PI/2;
+            hatPart.position.y = -15;
+            hat.add(hatPart);
+
+
+            scene.add( hat );
+            hat.position.set(30, 10, 0)
+           
+            //-------------------------------------------HAT------------------------------------------
+
+            light = new THREE.DirectionalLight(0xffffff, 0.4);
+            light.position.set(60, 50, 150)
+            scene.add(light);
+
+            function drawFrame()
+			{
+                mech.rotation.x -= 0.005;
+                hat.rotation.x -= 0.005;
+                hat.rotation.y -= 0.005;
+                hat.rotation.z -= 0.005;
+				renderer.render( scene, camera );
+			}
+        </script>
+	</body>
+</html>

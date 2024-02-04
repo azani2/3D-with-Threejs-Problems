@@ -1,0 +1,423 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="CSG.js"></script>
+		<script>
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x11133d );
+
+			var aspect = window.innerWidth/window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 200, 200, 800 );
+			camera.lookAt( new THREE.Vector3( 0, -2, 0 ) );
+
+            var ghostResidence = new THREE.Group();
+			var csg = new CSG();
+
+			//display axes
+			//showAxes();
+
+            //main building
+			//----------------------------BUILDING START
+            var material = new THREE.MeshLambertMaterial({color: 0x21201e});
+
+            //middle tower body
+            var botBlock = new THREE.Mesh(new THREE.CylinderGeometry(40, 60, 70, 4, 1));
+            var topBlock = new THREE.Mesh(new THREE.CylinderGeometry(80, 40, 120, 4, 1));
+            botBlock.rotation.y+= Math.PI/4;
+            topBlock.rotation.y+= Math.PI/4;
+            topBlock.position.set(0, 95, 0);
+            csg.union([botBlock, topBlock]);
+
+            //left tower body
+			//skywalk
+            botBlock = new THREE.Mesh(new THREE.BoxGeometry(130, 36, 52));
+			botBlock.position.set(-90, 50, 0);
+            botBlock.rotation.z-= Math.PI/20;
+			csg.union([botBlock]);
+			//body
+			topBlock = new THREE.Mesh(new THREE.CylinderGeometry(45, 36, 120, 4, 1));
+            topBlock.rotation.y+= Math.PI/4;
+			topBlock.position.set(-133, 102, 0);
+			csg.union([topBlock]);
+
+			//right tower body
+			//skywalk
+            botBlock = new THREE.Mesh(new THREE.BoxGeometry(140, 30, 40));
+			botBlock.position.set(90, 85, 0);
+            botBlock.rotation.z+= Math.PI/20;
+			csg.union([botBlock]);
+			//body
+			topBlock = new THREE.Mesh(new THREE.CylinderGeometry(45, 30, 80, 4, 1));
+            topBlock.rotation.y+= Math.PI/4;
+			topBlock.position.set(153, 120, 0);
+			csg.union([topBlock]);
+
+			//roof
+			//left roof
+			topBlock = new THREE.Mesh(new THREE.BoxGeometry(80, 20, 70));
+			topBlock.position.set(117, 160, 0);
+            topBlock.rotation.z+= Math.PI/20;
+			csg.union([topBlock]);
+			//right roof
+			topBlock = new THREE.Mesh(new THREE.BoxGeometry(80, 20, 70));
+			topBlock.position.set(190, 160, 0);
+            topBlock.rotation.z-= Math.PI/20;
+			csg.union([topBlock]);
+
+			//roof decoration
+			//left tower roof fence
+			//x axis parallel fences
+			for(let x = -159; x < -100; x+= 17) {
+				addBox(10, 15, 10, x, 165, -26);
+				addBox(10, 15, 10, x, 165, 26);
+			}
+			//z axis parallel fences
+			addBox(10, 15, 10, -159, 165, -8);
+			addBox(10, 15, 10, -159, 165, 8);
+			addBox(10, 15, 10, -108, 165, -8);
+			addBox(10, 15, 10, -108, 165, 8);
+
+			//middle tower roof fence
+			//x axis parallel fences
+			for(let x = -46; x < 50; x+= 23) {
+				addBox(15, 25, 15, x, 160, -47);
+				addBox(15, 25, 15, x, 160, 47);
+			}
+			//z axis parallel fences
+			for(let z = -23; z < 25; z+= 23) {
+				addBox(15, 25, 15, -46, 160, z);
+				addBox(15, 25, 15, 46, 160, z);
+			}
+			//bottom fence
+			addBox(110, 8, 18, 0, 159, 47);
+			addBox(110, 8, 18, 0, 159, -47);
+			addBox(18, 8, 110, -47, 159, 0);
+			addBox(18, 8, 110, 47, 159, 0);
+
+            var building = csg.toMesh();
+            building.material = material;
+			building.castShadow = true;
+            ghostResidence.add(building);
+
+			//-----------------------------------------BUILDING END
+
+			//-----------------------------------------WINDOWS START
+			//windows - FIX LIGHT
+			placeWindow(-19, 125, 40, "orange");
+			placeWindow(24, 120, 40, "lightgreen");
+			placeWindow(17, 90, 30, "red");
+			placeWindow(-10, 65, 27, "orange");
+			placeWindow(-140, 65, 17, "blue");
+			placeWindow(-125, 95, 20, "green");
+			placeWindow(-142, 130, 20, "orange");
+			placeWindow(150, 120, 20, "yellow");
+			//-----------------------------------------WINDOWS END
+
+			//door
+			//------------------------------------------DOOR START
+			{
+				var door = new THREE.Group();
+				var doorCSG = new CSG();
+
+				//flat square door
+				material = new THREE.MeshPhongMaterial({color: 0x522616});
+				var doorBase = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 5));
+				doorBase.position.set(16, 5, 0);
+				geometry = new THREE.CylinderGeometry(20, 20, 10, 16);
+				geometry.scale(0.8, 1, 1);
+				var inner = new THREE.Mesh(geometry);
+				inner.rotation.x+= Math.PI/2;
+
+				doorCSG.intersect([doorBase, inner]);
+				var doorRight = doorCSG.toMesh();
+				doorRight.material = material;
+				door.add(doorRight);
+
+				var doorLeft = doorCSG.toMesh();
+				doorLeft.material = material;
+				door.add(doorLeft);
+				doorLeft.rotation.y+= Math.PI/4;
+				doorLeft.position.set(-25, 0, 11);
+
+				var doorInside = doorCSG.toMesh();
+				doorInside.material = new THREE.MeshLambertMaterial({color: "black"});
+				door.add(doorInside);
+				doorInside.rotation.y+= Math.PI;
+				doorInside.position.set(1, 0, 0);
+
+            	ghostResidence.add(door);
+				door.position.set(0, -25, 40);
+			}
+			//--------------------------------------------DOOR END
+
+			//ground
+			//-----------------------------------------GROUND START
+			geometry = new THREE.SphereGeometry( 370, 16, 4);
+			geometry.scale(0.8, 0.01, 1);
+			grass = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color: 0x0a4013}) );
+			grass.position.set( 0, -35, 150 );
+			grass.receiveShadow = true;
+			ghostResidence.add( grass );
+			//------------------------------------------GROUND END
+
+			
+			//--------------------------------SUMMONING CIRCLE START
+			//summoning circle
+			
+			var summoningCircle = new THREE.Group();
+			csg = new CSG();
+			material = new THREE.MeshPhongMaterial({color: "red"});
+
+			var outer = new THREE.Mesh(new THREE.CylinderGeometry(62, 62, 2, 32));
+			
+			var inner = new THREE.Mesh(new THREE.CylinderGeometry(60, 60, 2, 32));
+
+			csg.subtract([outer, inner]);
+			var circleLine = csg.toMesh();
+			circleLine.material = material;
+			summoningCircle.add(circleLine);
+
+			var line = new THREE.Mesh(new THREE.BoxGeometry(120, 2, 1), material);
+			summoningCircle.add(line);
+			line.position.set(-8, 0, -15);
+			line.rotation.y+= Math.PI/5;
+
+			var line = new THREE.Mesh(new THREE.BoxGeometry(120, 2, 1), material);
+			summoningCircle.add(line);
+			line.position.set(18, 0, 5);
+			line.rotation.y+= Math.PI/5*2;
+
+			var line = new THREE.Mesh(new THREE.BoxGeometry(120, 2, 1), material);
+			summoningCircle.add(line);
+			line.position.set(-18, 0, 0);
+			line.rotation.y+= Math.PI/5*3;
+
+			var line = new THREE.Mesh(new THREE.BoxGeometry(120, 2, 1), material);
+			summoningCircle.add(line);
+			line.position.set(10, 0, -15);
+			line.rotation.y+= Math.PI/5*4;
+
+			line = new THREE.Mesh(new THREE.BoxGeometry(120, 2, 1), material);
+			summoningCircle.add(line);
+			line.position.set(0, 0, 22);
+
+
+			ghostResidence.add(summoningCircle);
+			summoningCircle.position.set(-120, -32, 180);
+			//--------------------------------SUMMONING CIRCLE END
+
+			//stone path
+			//----------------------------------STONE PATH START
+			placeStone(10, 0.9, 0.1, 1.1, 10, -30, 100);
+			placeStone(7, 1.2, 0.1, 0.8, -10, -30, 50);
+			placeStone(5, 1, 0.2, 0.8, 0, -30, 60);
+			placeStone(15, 1, 0.2, 0.8, -15, -30, 80);
+			placeStone(10, 1, 0.2, 1.2, -15, -30, 120);
+			placeStone(4, 1, 0.2, 1.2, -30, -30, 110);
+			placeStone(4, 1.3, 0.2, 1.2, 30, -30, 130);
+			placeStone(20, 1.6, 0.1, 0.9, 10, -30, 160);
+			placeStone(10, 0.9, 0.1, 1.1, -30, -30, 190);
+			placeStone(17, 1, 0.1, 1, 20, -30, 210);
+			placeStone(25, 1, 0.1, 1, -30, -30, 250);
+			placeStone(25, 1, 0.2, 1.1, 25, -30, 290);
+			//-------------------------------------STONE PATH END
+			
+			//Pumkins
+			//--------------------------------------PUMKINS START
+			addPumkin(15, 40, -22, 50, Math.PI/8);
+			addPumkin(10, 30, -25, 75, -Math.PI/9);
+			addPumkin(25, 90, -12, 150, -Math.PI/3);
+			addPumkin(14, 75, -23, 190, -Math.PI/6);
+			addPumkin(16, -120, -21, 180, Math.PI/6);
+			addPumkin(16, -120, -21, 180, Math.PI/6);
+			addPumkin(32, 120, -10, 30, -Math.PI/10);
+			//---------------------------------------PUMKINS END
+
+			//candles
+			//---------------------------------------CANDLES START
+			addCandle(70, 20, 80);
+			addCandle(90, 120, 0);
+			addCandle(-130, 20, 40);
+			addCandle(90, 60, 150);
+			addCandle(160, 20, 80);
+			addCandle(10, 80, 160);
+			addCandle(-90, -10, 60);
+			addCandle(-100, 20, 180);
+			addCandle(-70, 150, 10);
+			//---------------------------------------CANDLES END
+
+            scene.add(ghostResidence);
+
+			light = new THREE.PointLight(0x888888, 0.7, 0, 1);
+			light.castShadow = true;
+			light.position.set(0, 400, 700);
+			scene.add(light);
+
+			function showAxes() {
+				var material = new THREE.MeshPhongMaterial({color: 'white'});
+				var xAxis = new THREE.Mesh(new THREE.BoxGeometry(700, 1, 1), material);
+				var yAxis = new THREE.Mesh(new THREE.BoxGeometry(1, 700, 1), material);
+				var zAxis = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 700), material);
+				ghostResidence.add(xAxis, yAxis, zAxis);
+			}
+
+            function drawFrame()
+			{
+				// въртим мистериозния обект
+				ghostResidence.rotation.y += 0.005;
+				
+				renderer.render( scene, camera );
+			}
+
+			function addBox(xSize, ySize, zSize, x, y, z) {
+				var geometry = new THREE.BoxGeometry(xSize, ySize, zSize);
+				var beam = new THREE.Mesh(geometry);
+				topBlock.rotation.y+= Math.PI/4;
+				beam.position.set(x, y, z);
+				csg.union([beam]);
+			}
+
+			function placeWindow(x, y, z, color) {
+				var window = new THREE.Group();
+				var windowCSG = new CSG();
+
+				//oval shape
+				var geometry = new THREE.CylinderGeometry(10, 10, 30, 32);
+				geometry.scale(1.1, 1, 1.5);
+				var outer = new THREE.Mesh(geometry);
+				outer.rotation.x+= Math.PI/2;
+
+				geometry = new THREE.CylinderGeometry(8, 8, 30, 32);
+				geometry.scale(1.1, 1, 1.5);
+				var inner = new THREE.Mesh(geometry);
+				inner.rotation.x+= Math.PI/2;
+				windowCSG.subtract([outer, inner]);
+
+				inner = new THREE.Mesh(new THREE.BoxGeometry(40, 20, 50));
+				inner.position.set(0, -15, 0);
+				windowCSG.subtract([inner]);
+
+				//surface
+				outer = new THREE.Mesh(new THREE.BoxGeometry(26, 5, 40));
+				outer.position.set(0, -2, 0);
+				windowCSG.union([outer]);
+
+				//crossed lines
+				//vertical
+				outer = new THREE.Mesh(new THREE.BoxGeometry(1, 20, 1));
+				outer.position.set(0, 5, 15);
+				windowCSG.union([outer]);
+				//horizontal
+				outer = new THREE.Mesh(new THREE.BoxGeometry(17, 1, 1));
+				outer.position.set(0, 7, 15);
+				windowCSG.union([outer]);
+
+				var windowFrame = windowCSG.toMesh();
+            	windowFrame.material = material;
+            	window.add(windowFrame);
+
+				//inner color circle
+				geometry = new THREE.CircleGeometry(8, 8);
+				geometry.scale(1.1, 1, 1.5);
+				windowColor = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: color}));
+				window.add(windowColor);
+				windowColor.position.set(0, 7, 14);
+				
+				
+				//light
+				var light = new THREE.PointLight(color, 0.7, 350, 3);
+				window.add(light);
+				light.position.set(1, 7, 17);
+				light.castShadow = true;
+				ghostResidence.add(window);
+				window.position.set(x, y, z);
+			}
+		
+			function placeStone(r, scX, scY, scZ, posX, posY, posZ) {
+				var material = new THREE.MeshPhongMaterial({color: 0x6e7865});
+				var geometry = new THREE.SphereGeometry(r, 16, 16);
+				geometry.scale(scX, scY, scZ);
+				var stone = new THREE.Mesh(geometry, material);
+				ghostResidence.add(stone);
+				stone.position.set(posX, posY, posZ);
+			}
+
+			function addPumkin(r, x, y, z, rotationY) {
+				//body
+				var pumkin = new THREE.Group();
+				var geometry = new THREE.SphereGeometry(r, 16, 16);
+				geometry.scale(1.2 , 0.9, 1);
+				var pumkinBody = new THREE.Mesh(
+					geometry,
+					new THREE.MeshPhongMaterial({color: 'orange'})
+				);
+				pumkin.add(pumkinBody);
+				pumkinBody.castShadow = true;
+
+				//eyes
+				var eye = new THREE.Mesh(
+					new THREE.SphereGeometry(r/4, 8, 8),
+					new THREE.MeshPhongMaterial({color: "black"})
+				);
+				pumkin.add(eye);
+				eye.position.set(-r/2, r/3, r/4*3);
+				var eye = new THREE.Mesh(
+					new THREE.SphereGeometry(r/4, 8, 8),
+					new THREE.MeshPhongMaterial({color: "black"})
+				);
+				pumkin.add(eye);
+				eye.position.set(r/2, r/3, r/4*3);
+
+				ghostResidence.add(pumkin);
+				pumkin.rotation.y+= rotationY;
+				pumkin.position.set(x, y, z);
+			}
+
+			function addCandle(x, y, z) {
+				var candle = new THREE.Group();
+
+				var candleBody = new THREE.Mesh(
+					new THREE.CylinderGeometry(2.5, 2, 20, 8, 2),
+					new THREE.MeshPhongMaterial({color: 0xc7d656})
+				);
+				candle.add(candleBody);
+
+				var candleFlameBottom = new THREE.Mesh(
+					new THREE.SphereGeometry(1, 6, 6),
+					new THREE.MeshPhongMaterial({color: "yellow"})
+				);
+				var candleFlameTop = new THREE.Mesh(
+					new THREE.ConeGeometry(1, 4, 6, 6),
+					new THREE.MeshPhongMaterial({color: "yellow"})
+				);
+				candleFlameTop.position.set(0, 15, 0);
+				candleFlameBottom.position.set(0, 12, 0);
+				candle.add(candleFlameTop);
+				candle.add(candleFlameBottom);
+
+				var light = new THREE.PointLight(0xff172e, 0.7, 250, 2);
+				candle.add(light);
+				light.position.set(0, 9, 0);
+
+				ghostResidence.add(candle);
+				candle.position.set(x, y, z);
+
+			}
+		</script>
+	</body>
+</html>

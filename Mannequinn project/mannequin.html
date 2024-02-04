@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+
+<html>
+	<head>
+		<script src="three.min.js"></script>
+		<script src="mannequin.js"></script>
+		<style>
+			body {color: black; text-shadow: 0 0 4px gray; font-family: Calibri;}
+			h1   {position: fixed; z-index: 10; top: 0; left: 0; text-align: center; width: 100%;}
+			div  {position: fixed; z-index: 10; bottom: 1em; left: 1em; font-size: 1.5em; font-style: italic;}
+		</style>
+	</head>
+	<body>
+		<h1>Бояджийство</h1>  
+		<div>
+			За един имот-царство се води война,<br>
+			но не кой може да заплати нужната цена.<br>
+			С излишно време на ръце<br>
+			и малко жабешко сърце<br>
+			не само дъно, а и кладенец да няма,<br>
+			изгубят ли ума си в алчност двама,<br>
+			никога не ще се отрекат от целта<br>
+			и битката си ще водят във вечността.<br>
+			(какво иска да каже автора: https://www.youtube.com/watch?v=59lKdaXX6Eo)
+
+		</div>
+
+		<button style="position: fixed; font-size: 1.25em; width: 6em; top: 30%; left: calc(50% - 3em);" onclick="start()">Старт</button>
+		<audio id="music">
+			<source src="pink panther s1 e1 audio.mp3" type="audio/mpeg">
+		</audio>
+
+		<script>
+			function start( )
+			{
+				document.getElementById('music').play();
+
+				createScene();
+
+				//-----------------------add mannequins
+				Mannequin.colors = [
+				'pink',
+				'pink',
+				'pink',
+				'pink',
+				'pink',
+				'pink'
+				];
+				
+				pinko = new Male(0.8);
+				pinko.position.set(-37, -6, -3);
+				pinko.rotation.y+= Math.PI/2;
+
+				Mannequin.colors = [
+					'lightblue',
+					'lightblue',
+					'lightblue',
+					'lightblue',
+					'lightblue',
+					'lightblue'
+				];
+
+				guy = new Male(0.60);
+				guy.position.set(27, -12, 0);
+				guy.rotation.y-= Math.PI/2;
+
+				//----------------------COLUMN---------------
+				
+				var column = new THREE.Group;
+				var half = new THREE.Mesh(
+					new THREE.CylinderGeometry(10, 10, 60, 16, 8, true, 0, Math.PI),
+					new THREE.MeshPhongMaterial({color: 'blue'})
+				);
+				column.add(half);
+				half = new THREE.Mesh(
+					new THREE.CylinderGeometry(10, 10, 60, 16, 8, true, Math.PI, Math.PI),
+					new THREE.MeshPhongMaterial({color: 'pink'})
+				);
+				column.add(half);
+				scene.add(column);
+				column.rotation.y-= Math.PI/4;
+
+				//----------------------BRUSH----------------
+							
+				var brush = makeBrush('pink');
+				brush.rotation.set(Math.PI/2, Math.PI, 0);
+				brush.position.set(-1, 0.5, 0);
+				pinko.r_fingers.attach(brush);
+
+				brush = makeBrush('blue');
+				brush.rotation.set(Math.PI/2, Math.PI, 0);
+				brush.position.set(-1, 0.5, 0);
+				guy.r_fingers.attach(brush);
+
+				//--------------PINKO'S TAIL-------------
+			
+				class TailCurve extends THREE.Curve {
+
+					constructor( scale = 1 ) {
+						super();
+						this.scale = scale;
+					}
+
+					getPoint( t, optionalTarget = new THREE.Vector3() ) {
+						const tx = t * 3 - 1.5;
+						const ty = Math.cos( Math.PI* t + 2.1 );
+						const tz = 0;
+						return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+					}
+				}
+
+				var path = new TailCurve( 9 );
+
+				var tail = new THREE.Group();
+				var part = new THREE.Mesh(
+					new THREE.TubeGeometry(path, 32, .9, 16), 
+					new THREE.MeshPhongMaterial({color: 'pink'})
+				);
+				tail.add(part);
+
+				part = new THREE.Mesh(
+					new THREE.SphereGeometry(0.9, 8, 8),
+					new THREE.MeshPhongMaterial({color: 'pink'})
+				);
+				tail.add(part);
+				part.position.set(-13.5, -4.5, 0);
+
+				scene.add(tail);
+				tail.position.set(-10, 10, 0);
+				tail.rotation.set(0, 0, 0.5-Math.PI/2);
+
+				pinko.body.attach(tail);
+
+				//--------------------POSTURES-----------
+
+				up = {"version":7,"data":[[-4.4,5.7,0],[0,-90,0],[0,0,-2],[0,0,9],[8.9,-13.1,7.1],[20.6],[-6,-6,16.4],[-3.8,-0.5,-3.5],[25.3],[-1.4,6,33.1],[20.4,-4.9,-17.5],[26.5],[6.9,0,0],[-90,70,75,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[-18.8,-38.9,135.9],[15],[-5,0,0],[90,-70,75,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10]]};
+				bent = {"version":7,"data":[[0,3.8,0],[22.2,-90,0],[0,0,-60],[0,0,12.6],[14,4,32.8],[21.3],[-6,-6,17.3],[-23.8,-7.8,22.5],[37.5],[6,6,-20.8],[22.8,1.6,-17.9],[32],[17,0,0],[-90,70,75,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[-30.3,-9.6,76.4],[22.1],[4.1,0,0],[90,-70,75,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10],[0,0,10,0,10,0,10]]};
+				pinko.posture = up;
+				guy.posture = bent;
+			
+			}
+			
+			function makeBrush(color) {
+				var brush = new THREE.Group();
+
+				var part = new THREE.Mesh(
+					new THREE.CylinderGeometry(0.5, 0.5, 6),
+					new THREE.MeshPhongMaterial({color: 'brown'})
+				);
+				brush.add(part);
+				part = new THREE.Mesh(
+					new THREE.BoxGeometry(6, 1, 1),
+					new THREE.MeshPhongMaterial({color: 'brown'})
+				);
+				part.position.y+=3;
+				brush.add(part);
+				part = new THREE.Mesh(
+					new THREE.BoxGeometry(6, 4.5, 1),
+					new THREE.MeshPhongMaterial({color: color})
+				);
+				part.position.y+=5.75;
+				brush.add(part);
+				return brush;
+			}
+
+			function animate(t) {
+				var k = THREE.MathUtils.clamp(sin(1.7*t), 0, 1);
+				
+				pinko.posture = Mannequin.blend(up, bent, 1.2*k);
+				guy.posture = Mannequin.blend(bent, up, k);
+				pinko.r_fingers.bend = 80;
+				guy.r_fingers.bend = 80;
+			
+				if (k < 0.9 && k > 0.5) {
+					scene.rotation.y += 0.05;
+				}
+
+				scene.rotation.y += 0.002;
+			}
+		</script>
+	</body>
+</html>

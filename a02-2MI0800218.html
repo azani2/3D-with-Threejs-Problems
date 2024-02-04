@@ -1,0 +1,178 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script>
+            var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+
+            var scene = new THREE.Scene();
+			scene.background = new THREE.Color('blue');
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			var camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 0, 100 );
+			camera.lookAt( new THREE.Vector3() );
+
+            var group = new THREE.Group();
+			scene.add( group );
+
+            var geometry = new THREE.SphereGeometry(10, 32, 32);
+            var material = new THREE.MeshPhongMaterial({color: "red"});
+            var part = new THREE.Mesh(geometry, material);
+            group.add(part);
+
+            class SmallCurve extends THREE.Curve {
+
+            constructor( scale = 1 ) {
+                super();
+                this.scale = scale;
+            }
+
+            getPoint( t, optionalTarget = new THREE.Vector3() ) {
+                const tx = t * 3 - 1.5;
+                const ty = Math.sin( Math.PI * t );
+                const tz = 0;
+                return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+            }
+            }
+
+            //small legs
+            var path = new SmallCurve( 2 );
+            geometry = new THREE.TubeGeometry(path, 32, .8, 16);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(5, -10, 0);
+            part.rotation.z -= 0.6;
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-5, -10, 0);
+            part.rotation.z += 0.6;
+
+            //middle-sized legs
+            path = new SmallCurve( 3.5 );
+            geometry = new THREE.TubeGeometry(path, 32, .9, 16);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(6, -8.5, 0);
+            part.rotation.z -= 0.6;
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-6, -8.5, 0);
+            part.rotation.z += 0.6;
+
+            //big legs
+            path = new SmallCurve( 5 );
+            geometry = new THREE.TubeGeometry(path, 32, .9, 16);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(7.3, -7, 0);
+            part.rotation.z -= 0.6;
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-7.3, -7, 0);
+            part.rotation.z += 0.6;
+
+            //clams
+            path = new SmallCurve( 4 );
+            geometry = new THREE.TubeGeometry(path, 32, 1.2, 16);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-10.5, 7, 0);
+            part.rotation.z += 2.4;
+            
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(10.5, 7, 0);
+            part.rotation.z -= 2.4;
+
+            geometry = new THREE.SphereGeometry(5, 32, 16, Math.PI/2, Math.PI);
+            geometry.scale(1, 1.3, 0.8);
+            material = new THREE.MeshPhongMaterial({
+                color: "red", 
+                side: THREE.DoubleSide
+            });
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(16, 14, 0);
+            part.rotation.z -= 0.3;
+
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(14, 14, 0);
+            part.rotation.z -= 0.3;
+            part.rotation.y += Math.PI;
+
+
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-14, 14, 0);
+            part.rotation.z -= 0.3;
+
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-16, 14, 0);
+            part.rotation.z -= 0.3;
+            part.rotation.y += Math.PI;
+
+            //eyes
+            geometry = new THREE.SphereGeometry(3, 32, 16);
+            material = new THREE.MeshPhongMaterial({color: "white"})
+            geometry.scale(1, 1.3, 0.8);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(3, 10, 6);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-3, 10, 6);
+
+            //eye irises
+            geometry = new THREE.SphereGeometry(1, 32, 16);
+            material = new THREE.MeshPhongMaterial({color: "black"})
+            geometry.scale(1, 1.3, 0.8);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(3, 10, 8);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(-3, 10, 8);
+
+
+            //mouth
+            geometry = new THREE.SphereGeometry(5, 32, 16, 0, Math.PI, Math.PI/2, Math.PI/2);
+            material = new THREE.MeshPhongMaterial({color: "black"})
+            geometry.scale(1.3, 1, 1.1);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(0, 0, 5.5);
+            part.rotation.x -= 0.1;
+
+            geometry = new THREE.SphereGeometry(2, 32, 16);
+            material = new THREE.MeshPhongMaterial({color: "darkred"})
+            geometry.scale(1.5, 1, 1.1);
+            part = new THREE.Mesh(geometry, material);
+            group.add(part);
+            part.position.set(0, -1.5, 9);
+
+            var light = new THREE.DirectionalLight();
+			light.position.set( 0, 40, 100 );
+			scene.add( light );
+
+			
+			function drawFrame()
+			{
+				group.rotation.y += 0.005;
+				renderer.render( scene, camera );
+			}
+
+        </script>
+    </body>
+</html>

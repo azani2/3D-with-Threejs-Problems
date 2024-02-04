@@ -1,0 +1,135 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script>
+            //TO-DO
+            //Finish seeds drawing functions
+                //To switch between manually placed seeds and randomized seeds:
+                //Comment to select the functions on lines 90, 91 and 92
+            //Add green stripes (next time)
+            
+            var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+
+            var scene = new THREE.Scene();
+			scene.background = new THREE.Color('lightblue');
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			var camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 250, 120, 200 );
+			camera.lookAt( new THREE.Vector3() );
+
+            //Watermelon group
+            var watermelon = new THREE.Group();
+			scene.add( watermelon );
+
+            //Kora
+            var geometry = new THREE.SphereGeometry(70, 32, 16, 0, Math.PI/2);
+            var material = new THREE.MeshPhongMaterial({
+                color: "darkgreen",
+                side: THREE.DoubleSide
+            });
+            var part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.position.set(0,0,0)
+            
+
+            //Side green
+            geometry = new THREE.CircleGeometry(70, 32, Math.PI/2 , Math.PI);
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+
+            geometry = new THREE.CircleGeometry(70, 32, Math.PI/2 , Math.PI);
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.rotation.y += Math.PI/2;
+
+            //Side white
+            var material = new THREE.MeshPhongMaterial({
+                color: "white",
+                side: THREE.DoubleSide
+            });
+
+            geometry = new THREE.CircleGeometry(65, 32, Math.PI/2 , Math.PI);
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.position.set(-0.1, 0, -0.1);
+
+            geometry = new THREE.CircleGeometry(65, 32, Math.PI/2 , Math.PI);
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.rotation.y += Math.PI/2;
+            part.position.set(0.1, 0, 0.1);
+
+            //Side red
+            var material = new THREE.MeshPhongMaterial({
+                color: "red",
+                side: THREE.DoubleSide
+            });
+
+            geometry = new THREE.CircleGeometry(63, 32, Math.PI/2 , Math.PI);
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.position.set(0.1, 0, -0.28);
+
+            part = new THREE.Mesh( geometry, material);
+            watermelon.add(part);
+            part.rotation.y += Math.PI/2;
+            part.position.set(0.28, 0, -0.2);
+
+            //Seeds - choose one function by commenting the other two
+            addRandomSeeds();           //kind of ugly but charismatic
+            //addRadialSeeds();          //too static for a watermelon
+            //addManuallyDrawnSeeds();   //too much work
+
+            var light = new THREE.DirectionalLight();
+			light.position.set( 250, 70, 200 );
+			scene.add( light );
+
+            function drawFrame()
+            {
+                watermelon.rotation.y -= 0.010;
+                renderer.render(scene, camera);
+            }
+
+            //Randomized seeds are kind of ugly, I suggest hand draw them
+            function addRandomSeeds() {
+                geometry = new THREE.CircleGeometry(2.3, 16);
+                geometry.scale(1.5, 0.8, 1);
+                material = new THREE.MeshPhongMaterial({
+                color: "black",
+                side: THREE.DoubleSide
+                });
+                //On x=0 plane
+                for (let i = 0; i < 25; i++) {
+                    var y = 50 - Math.random() * 100;
+                    var z = 7 + Math.random() * (55 - Math.abs(y));
+                    part = new THREE.Mesh( geometry, material);
+                    part.rotation.y += Math.PI/2;
+                    part.rotation.z += Math.random() * Math.PI * 2;
+                    part.position.set(0.4, y, z);
+                    watermelon.add(part);
+                }
+                //On y=0 plane
+                for (let i = 0; i < 25; i++) {
+                    var y = 50 - Math.random() * 100;
+                    var x = 7 + Math.random() * (55 - Math.abs(y));
+                    part = new THREE.Mesh( geometry, material);
+                    part.rotation.y += Math.PI;
+                    part.rotation.z += Math.random() * Math.PI * 2;
+                    part.position.set(-x, y, -0.4);
+                    watermelon.add(part);
+                }
+            }
+        </script>
+    </body>
+</html>

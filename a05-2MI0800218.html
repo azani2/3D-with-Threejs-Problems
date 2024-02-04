@@ -1,0 +1,147 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="CSG.js"></script>
+		<script>
+			// Задача: Направете топки да се пързалят напряко
+			// по улей до затихване. Улеят също го направете.			
+			
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 'skyblue' );
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			var camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 120, 300 );
+			camera.lookAt( new THREE.Vector3( 0, -10, 0 ) );
+
+            //----------------TABLE----------------------
+            
+            var table = new THREE.Group();
+            var platform = new THREE.Mesh(
+				new THREE.BoxGeometry( 150, 10, 100),
+				new THREE.MeshPhongMaterial( {color: 'brown', shininess: 2, specular: 'white'} )
+			);
+            platform.position.set(0, 20, 0);
+            platform.receiveShadow = true;
+
+            table.add(platform);
+
+            //--------------------LEGS-----------------
+
+            var leg = new THREE.Mesh(
+				new THREE.BoxGeometry( 10, 40, 10),
+				new THREE.MeshPhongMaterial( {color: 'brown', shininess: 2, specular: 'white'} )
+			);
+            leg.position.set(70, 0, 40);
+            table.add(leg);
+            leg = new THREE.Mesh(
+				new THREE.BoxGeometry( 10, 40, 10),
+				new THREE.MeshPhongMaterial( {color: 'brown', shininess: 2, specular: 'white'} )
+			);
+            leg.position.set(-70, 0, -40);
+            table.add(leg);
+            leg = new THREE.Mesh(
+				new THREE.BoxGeometry( 10, 40, 10),
+				new THREE.MeshPhongMaterial( {color: 'brown', shininess: 2, specular: 'white'} )
+			);
+            leg.position.set(-70, 0, 40);
+            table.add(leg);
+            leg = new THREE.Mesh(
+				new THREE.BoxGeometry( 10, 40, 10),
+				new THREE.MeshPhongMaterial( {color: 'brown', shininess: 2, specular: 'white'} )
+			);
+            leg.position.set(70, 0, -40);
+            table.add(leg);
+
+            scene.add(table);
+            //----------------------FLOOR---------------
+
+            var floor = new THREE.Mesh(
+				new THREE.BoxGeometry( 300, 2, 300),
+				new THREE.MeshPhongMaterial( {color: 'green', shininess: 2, specular: 'white'} )
+			);
+            floor.position.set(0, -20, 0);
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            //----------------------BALL----------------
+            
+            var ball = new THREE.Mesh(
+				new THREE.SphereGeometry( 4, 16, 8 ),
+				new THREE.MeshPhongMaterial( {shininess: 100 } )
+			);
+            ball.throwShadow = true;
+            ball.receiveShadow = true;
+            ball.position.set(0, 32, 0);
+            ball.v = new THREE.Vector3(rand(-1, 1), 0, rand(-1, 1));
+            ball.a = 1;
+            scene.add(ball);
+
+            //---------------------------LIGHT----------
+
+            var light = new THREE.DirectionalLight();
+            light.position.set(-150, 100, 200);
+            scene.add(light);
+
+			function rand(a,b) {
+				var r = (Math.random()+Math.random())/2;
+				return a+(b-a)*r;
+			}
+
+            var height = platform.position.y + 5;
+            var x = 0;
+            var clock = new THREE.Clock();
+			function drawFrame() {
+				var t = clock.getElapsedTime();
+			    scene.rotation.y = Math.PI/2+Math.cos(t/2)/2;
+                var v = 6 / (1 + ball.a*ball.a);
+				
+               if (ball.position.x <= 75 &&
+                    ball.position.x >= -75 &&
+                    ball.position.z <= 50 &&
+                    ball.position.z >= -50 &&
+                    ball.position.y == 32) {
+
+                    ball.position.x+= t*ball.v.x;
+                    ball.position.y+= 0;
+                    ball.position.z+= t*ball.v.z; 
+                    
+                } else if (ball.position.y >= height -5) {
+                    x++;
+					ball.position.y-= -Math.log(x/15);
+					ball.position.x+= t*ball.v.x;
+                    ball.position.z+= t*ball.v.z; 
+                } else if (ball.position.y > -15) {
+                    ball.v.y = -0.3;
+                    ball.position.y+= t*ball.v.y;
+					ball.position.x+= t*ball.v.x;
+                    ball.position.z+= t*ball.v.z; 
+                } else if (ball.position.x <= 150 &&
+                        ball.position.x >= -150 &&
+                        ball.position.z <= 150 &&
+                        ball.position.z >= -150) {
+                    ball.v.x*= 0.8;
+                    ball.v.z*= 0.98;
+                    ball.position.x+= t*ball.v.x;
+                    ball.position.z+= t*ball.v.z; 
+                }
+				
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>

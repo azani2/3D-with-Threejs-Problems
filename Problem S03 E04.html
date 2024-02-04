@@ -1,0 +1,60 @@
+﻿<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script>
+			// Задача: измислете как да представите обекта
+			// от условието на задачата, чрез използване на
+			// готови обекти от Three.js.
+
+			
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( drawFrame );
+			document.body.appendChild( renderer.domElement );
+
+			var scene = new THREE.Scene();
+			
+			var aspect = window.innerWidth/window.innerHeight;
+			var camera = new THREE.PerspectiveCamera( 30, aspect );
+			camera.position.set( 0, 0, 30 );
+			camera.lookAt( new THREE.Vector3() );
+
+			var object = new THREE.Group();
+			scene.add( object );
+			
+			//central sphere
+			var geometry = new THREE.SphereGeometry( 4, 30, 30 );
+			var material = new THREE.MeshPhongMaterial({color: "darkblue"});
+			object.add( new THREE.Mesh( geometry, material ) );
+
+			//middle ring
+			var geometry = new THREE.TorusGeometry( 5, 1, 30, 50 );
+			var material = new THREE.MeshPhongMaterial({color: "beige"});
+			object.add( new THREE.Mesh( geometry, material ) );
+
+			//outer ring
+			var geometry = new THREE.TorusGeometry( 6.5, 0.5, 30, 70 );
+			var material = new THREE.MeshPhongMaterial({color: "coral"});
+			object.add( new THREE.Mesh( geometry, material ) );
+
+
+			// Светлини
+			var light = new THREE.PointLight();
+			light.position.set( 0, 0, 20 );
+			scene.add( light );
+			
+			function drawFrame()
+			{
+				object.rotation.x += 0.005;
+				object.rotation.y += 0.005;
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>
